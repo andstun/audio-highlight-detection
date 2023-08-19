@@ -1,4 +1,4 @@
-# Dejavu
+# HighlightDetector
 
 # DEJAVU JSON RESPONSE
 SONG_ID = "song_id"
@@ -23,12 +23,6 @@ QUERY_TIME = 'query_time'
 ALIGN_TIME = 'align_time'
 OFFSET = 'offset'
 OFFSET_SECS = 'offset_seconds'
-
-# DATABASE CLASS INSTANCES:
-DATABASES = {
-    'mysql': ("dejavu.database_handler.mysql_database", "MySQLDatabase"),
-    'postgres': ("dejavu.database_handler.postgres_database", "PostgreSQLDatabase")
-}
 
 # TABLE SONGS
 SONGS_TABLENAME = "songs"
@@ -81,7 +75,7 @@ DEFAULT_FAN_VALUE = 5  # 15 was the original value.
 DEFAULT_AMP_MIN = 10
 
 # Number of cells around an amplitude peak in the spectrogram in order
-# for Dejavu to consider it a spectral peak. Higher values mean less
+# for HighlightDetector to consider it a spectral peak. Higher values mean less
 # fingerprints and faster matching, but can potentially affect accuracy.
 PEAK_NEIGHBORHOOD_SIZE = 10  # 20 was the original value.
 

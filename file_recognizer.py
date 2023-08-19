@@ -1,18 +1,18 @@
 from time import time
 from typing import Dict
 
-import dejavu.logic.decoder as decoder
-from dejavu.base_classes.base_recognizer import BaseRecognizer
-from dejavu.config.settings import (ALIGN_TIME, FINGERPRINT_TIME, QUERY_TIME,
+import decoder
+from base_recognizer import BaseRecognizer
+from settings import (ALIGN_TIME, FINGERPRINT_TIME, QUERY_TIME,
                                     RESULTS, TOTAL_TIME)
 
 
 class FileRecognizer(BaseRecognizer):
-    def __init__(self, dejavu):
-        super().__init__(dejavu)
+    def __init__(self, highlight_detector):
+        super().__init__(highlight_detector)
 
     def recognize_file(self, filename: str) -> Dict[str, any]:
-        channels, self.Fs, _ = decoder.read(filename, self.dejavu.limit)
+        channels, self.Fs, _ = decoder.read(filename, self.highlight_detector.limit)
 
         t = time()
         matches, fingerprint_time, query_time, align_time = self._recognize(*channels)

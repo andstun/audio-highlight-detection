@@ -1,9 +1,8 @@
 import json
 import argparse
 
-from dejavu import Dejavu
-from dejavu.logic.recognizer.file_recognizer import FileRecognizer
-from dejavu.logic.recognizer.microphone_recognizer import MicrophoneRecognizer
+from highlight_detector import HighlightDetector
+from file_recognizer import FileRecognizer
 
 # load config from a JSON file (or anything outputting a python dictionary)
 with open("dejavu.cnf.SAMPLE") as f:
@@ -11,18 +10,18 @@ with open("dejavu.cnf.SAMPLE") as f:
 
 if __name__ == '__main__':
 
-    # create a Dejavu instance
-    djv = Dejavu(config)
+    # create a HighlightDetector instance
+    highlight_detector = HighlightDetector(config)
 
     # Fingerprint all the mp3's in the directory we give it
-    djv.fingerprint_directory("test", [".wav"])
+    highlight_detector.fingerprint_directory("test", [".wav"])
 
     parser = argparse.ArgumentParser()
     parser.add_argument("path")
     args = parser.parse_args()
 
     # Recognize audio from a file
-    results = djv.recognize(FileRecognizer, args.path)
+    results = highlight_detector.recognize(FileRecognizer, args.path)
     print(f"From file we recognized: {results}\n")
 
     # Or recognize audio from your microphone for `secs` seconds
