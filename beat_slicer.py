@@ -1,8 +1,10 @@
 import librosa
 import subprocess
+import numpy as np
 import os
 from pydub import AudioSegment
 from typing import Dict, List, Tuple
+
 
 from highlight_detector import HighlightDetector
 from file_recognizer import FileRecognizer
@@ -82,7 +84,7 @@ def analyze_non_lyrical(input_file: str, dir: str) -> Tuple[List[float], Dict[st
         results = highlight_detector.recognize(FileRecognizer, f"{slices_dir}/"+file)
 
         result_names = [result['song_name'] for result in results['results']]
-        print(f"From file we recognized: {result_names}\n")
+        # print(f"From file we recognized: {result_names}\n")
         timestamps_per_song = []
         for result_name in result_names:
             result_name = result_name.decode().split('_')[0]
@@ -111,6 +113,23 @@ def analyze_non_lyrical(input_file: str, dir: str) -> Tuple[List[float], Dict[st
     print(f"\nSong moments and their ids: {song_ids}")
 
     print("\nFile processing was succesfully completed!")
+    hist_data, _ = np.histogram(timestamps, bins=binsize) # Adjust the number of bins if needed
+    
+    sorted_moments = sorted(song_ids.keys(), key=lambda x: float(x.split("_")[0]))
+    max_value = hist_data.argmax()
+    timestamp = sorted_moments[max_value]
+    '''most_common_moments = np.where(hist_data == max_value)
+
+        print(f"most_common_moments: {most_common_moments} and type: {type(most_common_moments)}")
+        subprocess.run(["rm", dir+"results.txt"], check=False)
+        with open(dir+"key_moments.txt", "a") as f:
+            for array in most_common_moments:
+                print(f"writing the string: {sorted_moments[array[0]]}")
+                f.write(str(sorted_moments[array[0]]))'''
+    bestchorus_beat_start = float(timestamp.split("_")[0])
+    bestchorus_beat_end = float(timestamp.split("_")[1])
+        
+    # return bestchorus_beat_start, bestchorus_beat_end
     return timestamps, timestamps_graph, song_ids, binsize
 
 if __name__ == '__main__':
