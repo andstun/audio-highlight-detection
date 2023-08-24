@@ -4,12 +4,24 @@ import numpy as np
 import os
 from pydub import AudioSegment
 from typing import Dict, List, Tuple
-
+from matplotlib import pyplot as plt
+import seaborn as sns
+import pandas as pd
 
 from highlight_detector import HighlightDetector
 from file_recognizer import FileRecognizer
 from settings import (FIELD_SONG_ID, FIELD_SONGNAME)
 
+def plot_histogram(name: str, save_dir: str, timestamps: List[float], binsize: int, df):
+    # Plot the heatmap
+    plt.figure(figsize=(15, 3))
+    sns.heatmap(df, cmap="YlGnBu", cbar_kws={'label': 'Density'})
+    plt.title(f'Timestamp Density for {name}')
+    plt.xlabel('Time (seconds)')
+    plt.ylabel('Frequency')
+    plt.savefig(save_dir + 'output.png')
+    print("showing plot now:")
+    plt.show() 
 
 def analyze_non_lyrical(input_file: str, dir: str) -> Tuple[List[float], Dict[str, List[float]], Dict[str, float], int]:
     slices_dir = dir + "slices"
@@ -113,19 +125,29 @@ def analyze_non_lyrical(input_file: str, dir: str) -> Tuple[List[float], Dict[st
     print(f"\nSong moments and their ids: {song_ids}")
 
     print("\nFile processing was succesfully completed!")
-    hist_data, _ = np.histogram(timestamps, bins=binsize) # Adjust the number of bins if needed
+    hist_data, bins = np.histogram(timestamps, bins=binsize) # Adjust the number of bins if needed
+    hist_data = hist_data.reshape(-1, 1) # Normalizing the hist_data for the heatmap
+    
+    time_labels = [(f"{int(bins[i])} - {int(bins[i+1])} s") for i in range(len(bins) - 1)] # Define the time labels for the x-axis
     
     sorted_moments = sorted(song_ids.keys(), key=lambda x: float(x.split("_")[0]))
     max_value = hist_data.argmax()
     timestamp = sorted_moments[max_value]
-    '''most_common_moments = np.where(hist_data == max_value)
 
-        print(f"most_common_moments: {most_common_moments} and type: {type(most_common_moments)}")
-        subprocess.run(["rm", dir+"results.txt"], check=False)
-        with open(dir+"key_moments.txt", "a") as f:
-            for array in most_common_moments:
-                print(f"writing the string: {sorted_moments[array[0]]}")
-                f.write(str(sorted_moments[array[0]]))'''
+    df = pd.DataFrame(hist_data, columns=['Density'])
+    df.index = time_labels
+    df = df.T
+    name = input_file
+    
+    print(f"timestamps: {timestamps}")
+    plt.figure(figsize=(15, 3))
+    sns.heatmap(df, cmap="YlGnBu", cbar_kws={'label': 'Density'})
+    plt.title(f'Timestamp Density for {name}')
+    plt.xlabel('Time (seconds)')
+    plt.ylabel('Frequency')
+    plt.savefig(dir + 'output.png')
+    print("showing plot now:")
+    plt.show() 
     bestchorus_beat_start = float(timestamp.split("_")[0])
     bestchorus_beat_end = float(timestamp.split("_")[1])
         
